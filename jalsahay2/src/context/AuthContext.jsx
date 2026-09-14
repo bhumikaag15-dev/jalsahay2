@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from '../lib/supabaseClient';
+import { supabase, supabaseConfigError } from '../lib/supabaseClient';
 
 const AuthContext = createContext();
 
@@ -8,11 +8,22 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch active session from Supabase
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+    if (supabaseConfigError) {
       setLoading(false);
-    });
+      return;
+    }
+
+    // Fetch active session from Supabase
+    supabase.auth
+      .getSession()
+      .then(({ data: { session } }) => {
+        setUser(session?.user ?? null);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error(error);
+        setLoading(false);
+      });
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
@@ -24,11 +35,21 @@ export const AuthProvider = ({ children }) => {
     };
   }, []);
 
+  const getConfigError = () => ({
+    error: {
+      message: supabaseConfigError
+    }
+  });
+
   const loginWithEmail = async (email, password) => {
+    if (supabaseConfigError) return getConfigError();
+
     return await supabase.auth.signInWithPassword({ email, password });
   };
 
   const signUpWithEmail = async (email, password, metadata) => {
+    if (supabaseConfigError) return getConfigError();
+
     return await supabase.auth.signUp({
       email,
       password,
@@ -37,6 +58,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   const loginWithGoogle = async () => {
+    if (supabaseConfigError) return getConfigError();
+
     return await supabase.auth.signInWithOAuth({ provider: 'google' });
   };
 
