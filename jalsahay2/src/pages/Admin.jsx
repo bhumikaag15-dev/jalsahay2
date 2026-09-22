@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Admin() {
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useLanguage();
 
   useEffect(() => {
     loadComplaints();
@@ -37,7 +39,7 @@ export default function Admin() {
 
     if (error) {
       console.error(error);
-      alert('Could not update status: ' + error.message);
+      alert(t.couldNotUpdateStatus + ' ' + error.message);
       return;
     }
 
@@ -56,11 +58,11 @@ export default function Admin() {
       <div>
 
         <h1 className="text-3xl font-bold">
-          Municipal Authority Admin Panel
+          {t.adminPanel}
         </h1>
 
         <p className="text-sm text-slate-500">
-          Manage incoming complaints and update their status.
+          {t.manageComplaints}
         </p>
 
       </div>
@@ -70,13 +72,13 @@ export default function Admin() {
         {loading ? (
 
           <div className="p-8 text-center text-slate-400">
-            Loading complaints...
+            {t.loadingComplaints}
           </div>
 
         ) : complaints.length === 0 ? (
 
           <div className="p-8 text-center text-slate-400">
-            No complaints have been submitted yet.
+            {t.noComplaintsSubmittedYet}
           </div>
 
         ) : (
@@ -90,12 +92,12 @@ export default function Admin() {
                 <tr>
 
                   <th className="p-4">ID</th>
-                  <th className="p-4">Citizen</th>
-                  <th className="p-4">Category</th>
-                  <th className="p-4">Ward</th>
-                  <th className="p-4">Priority</th>
-                  <th className="p-4">Status</th>
-                  <th className="p-4">Action</th>
+                  <th className="p-4">{t.citizen}</th>
+                  <th className="p-4">{t.category}</th>
+                  <th className="p-4">{t.ward}</th>
+                  <th className="p-4">{t.priority}</th>
+                  <th className="p-4">{t.status}</th>
+                  <th className="p-4">{t.action}</th>
 
                 </tr>
 
@@ -120,7 +122,7 @@ export default function Admin() {
                     </td>
 
                     <td className="p-4">
-                      Ward {c.ward_number}
+                      {t.ward} {c.ward_number}
                     </td>
 
                     <td className="p-4 font-semibold text-rose-500">
@@ -141,11 +143,11 @@ export default function Admin() {
                         className="p-1 rounded-lg border border-slate-300 dark:border-slate-700 text-xs bg-white/50 dark:bg-slate-800"
                       >
 
-                        <option>Submitted</option>
-                        <option>Assigned</option>
-                        <option>In Progress</option>
-                        <option>Resolved</option>
-                        <option>Closed</option>
+                        <option value="Submitted">{t.submitted}</option>
+                        <option value="Assigned">{t.assigned}</option>
+                        <option value="In Progress">{t.inProgress}</option>
+                        <option value="Resolved">{t.resolved}</option>
+                        <option value="Closed">{t.closed}</option>
 
                       </select>
 

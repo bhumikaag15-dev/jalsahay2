@@ -11,9 +11,52 @@ import {
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-import { supabase } from '../lib/supabaseClient';
+import { supabase, supabaseConfigError } from '../lib/supabaseClient';
+import { useLanguage } from '../context/LanguageContext';
 
 const defaultCenter = [18.5204, 73.8567];
+
+const fallbackComplaints = [
+  {
+    id: 'fallback-1',
+    full_name: 'Municipal Demo',
+    category: 'Pipeline Leakage',
+    priority: 'Emergency',
+    status: 'Open',
+    description: 'Severe pipe burst near the main distribution line.',
+    ward_number: 12,
+    address: 'Panshet Road, Pune',
+    latitude: 18.37806,
+    longitude: 73.61346,
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'fallback-2',
+    full_name: 'Municipal Demo',
+    category: 'Low Water Pressure',
+    priority: 'High',
+    status: 'In Progress',
+    description: 'Low pressure reported in central service zone.',
+    ward_number: 8,
+    address: 'Market Yard, Pune',
+    latitude: 18.5204,
+    longitude: 73.8567,
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'fallback-3',
+    full_name: 'Municipal Demo',
+    category: 'Dirty Water Supply',
+    priority: 'Medium',
+    status: 'Open',
+    description: 'Water discoloration reported in a residential cluster.',
+    ward_number: 5,
+    address: 'Kothrud, Pune',
+    latitude: 18.5074,
+    longitude: 73.8077,
+    created_at: new Date().toISOString()
+  }
+];
 
 const markerIcon = new L.Icon({
   iconUrl:
@@ -55,8 +98,15 @@ export default function ComplaintMap() {
   const [complaints, setComplaints] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { t } = useLanguage();
 
   async function loadComplaints() {
+    if (supabaseConfigError) {
+      setComplaints(fallbackComplaints);
+      setLoading(false);
+      return;
+    }
+
     const { data, error } = await supabase
       .from('complaints')
       .select(`
@@ -77,15 +127,21 @@ export default function ComplaintMap() {
 
     if (error) {
       console.error('Map complaints error:', error);
+      setComplaints(fallbackComplaints);
+      setLoading(false);
       return;
     }
 
-    setComplaints(data || []);
+    setComplaints(data || fallbackComplaints);
     setLoading(false);
   }
 
   useEffect(() => {
     loadComplaints();
+
+    if (supabaseConfigError) {
+      return undefined;
+    }
 
     const channel = supabase
       .channel('complaint-map-updates')
@@ -103,13 +159,15 @@ export default function ComplaintMap() {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
     };
   }, []);
 
   function detectMyLocation() {
     if (!navigator.geolocation) {
-      alert('GPS is not supported by your browser.');
+      alert(t.gpsNotSupported);
       return;
     }
 
@@ -122,7 +180,7 @@ export default function ComplaintMap() {
       },
       () => {
         alert(
-          'Location permission was denied. Please allow location access.'
+          t.locationPermissionMap
         );
       }
     );
@@ -134,11 +192,11 @@ export default function ComplaintMap() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold">
-            Live Complaint Map
+            {t.liveComplaintMap}
           </h2>
 
           <p className="text-sm text-slate-500">
-            Complaint locations from Supabase
+            {t.complaintLocationsSupabase}
           </p>
         </div>
 
@@ -146,7 +204,7 @@ export default function ComplaintMap() {
           onClick={detectMyLocation}
           className="px-4 py-2 rounded-xl bg-blue-600 text-white font-semibold text-sm"
         >
-          📍 Use My GPS
+          📍 {t.useMyGps}
         </button>
       </div>
 
@@ -197,27 +255,27 @@ export default function ComplaintMap() {
                       </strong>
 
                       <div>
-                        <b>Priority:</b>{' '}
+                        <b>{t.priority}:</b>{' '}
                         {complaint.priority}
                       </div>
 
                       <div>
-                        <b>Status:</b>{' '}
+                        <b>{t.status}:</b>{' '}
                         {complaint.status}
                       </div>
 
                       <div>
-                        <b>Ward:</b>{' '}
+                        <b>{t.ward}:</b>{' '}
                         {complaint.ward_number}
                       </div>
 
                       <div>
-                        <b>Address:</b>{' '}
+                        <b>{t.address}:</b>{' '}
                         {complaint.address}
                       </div>
 
                       <div>
-                        <b>Description:</b>{' '}
+                        <b>{t.description}:</b>{' '}
                         {complaint.description}
                       </div>
 
@@ -257,7 +315,7 @@ export default function ComplaintMap() {
                 icon={markerIcon}
               >
                 <Popup>
-                  <b>Your current GPS location</b>
+                  <b>{t.yourLocation}</b>
                 </Popup>
               </Marker>
             </>

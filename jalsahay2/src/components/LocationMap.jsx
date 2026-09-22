@@ -7,13 +7,15 @@ import {
 } from 'react-leaflet';
 
 import 'leaflet/dist/leaflet.css';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function LocationMap({ latitude, longitude }) {
+  const { t } = useLanguage();
 
   if (!latitude || !longitude) {
     return (
       <div className="p-4 rounded-xl bg-slate-100 text-sm">
-        Detect your location first.
+        {t.detectYourLocationFirst}
       </div>
     );
   }
@@ -38,7 +40,7 @@ export default function LocationMap({ latitude, longitude }) {
 
         <Marker position={position}>
           <Popup>
-            Your complaint location
+            {t.yourComplaintLocation}
           </Popup>
         </Marker>
 

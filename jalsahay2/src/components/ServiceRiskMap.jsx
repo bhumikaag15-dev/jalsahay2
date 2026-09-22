@@ -7,6 +7,7 @@ import {
 } from 'react-leaflet';
 
 import 'leaflet/dist/leaflet.css';
+import { useLanguage } from '../context/LanguageContext';
 
 function getRiskColor(level) {
   switch (level) {
@@ -25,10 +26,11 @@ function getRiskColor(level) {
 }
 
 export default function ServiceRiskMap({ zones }) {
+  const { t } = useLanguage();
   if (!zones || zones.length === 0) {
     return (
       <div className="p-8 text-center text-slate-500">
-        No service risk data available.
+        {t.noServiceRiskData}
       </div>
     );
   }
@@ -43,11 +45,11 @@ export default function ServiceRiskMap({ zones }) {
 
       <div>
         <h2 className="text-xl font-bold">
-          Water Service Risk Map
+          {t.waterServiceRiskMap}
         </h2>
 
         <p className="text-sm text-slate-500">
-          Weather + complaint activity based risk analysis
+          {t.weatherComplaintRisk}
         </p>
       </div>
 
@@ -107,60 +109,60 @@ export default function ServiceRiskMap({ zones }) {
                       }}
                       className="font-bold"
                     >
-                      {zone.riskLevel} Risk
+                      {zone.riskLevel} {t.risk}
                     </div>
 
                     <div>
-                      <b>Risk Score:</b>{' '}
+                      <b>{t.riskScore}:</b>{' '}
                       {zone.score}/100
                     </div>
 
                     <hr />
 
                     <div>
-                      <b>Nearby complaints:</b>{' '}
+                      <b>{t.nearbyComplaints}:</b>{' '}
                       {zone.complaints}
                     </div>
 
                     <div>
-                      <b>Open complaints:</b>{' '}
+                      <b>{t.openComplaints}:</b>{' '}
                       {zone.openComplaints}
                     </div>
 
                     <div>
-                      <b>High priority:</b>{' '}
+                      <b>{t.highPriorityLabel}:</b>{' '}
                       {zone.highPriorityComplaints}
                     </div>
 
                     <hr />
 
                     <div>
-                      <b>Temperature:</b>{' '}
+                      <b>{t.temperature}:</b>{' '}
                       {zone.weather.temperature}°C
                     </div>
 
                     <div>
-                      <b>Humidity:</b>{' '}
+                      <b>{t.humidity}:</b>{' '}
                       {zone.weather.humidity}%
                     </div>
 
                     <div>
-                      <b>7-day rainfall:</b>{' '}
+                      <b>{t.sevenDayRainfall}:</b>{' '}
                       {zone.weather.totalRain} mm
                     </div>
 
                     <div>
-                      <b>Rain probability:</b>{' '}
+                      <b>{t.rainProbability}:</b>{' '}
                       {zone.weather.maxRainProbability}%
                     </div>
 
                     <div>
-                      <b>Maximum wind:</b>{' '}
+                      <b>{t.maximumWind}:</b>{' '}
                       {zone.weather.maxWind} km/h
                     </div>
 
                     <div>
-                      <b>Maximum temperature:</b>{' '}
+                      <b>{t.maximumTemperature}:</b>{' '}
                       {zone.weather.maxTemperature}°C
                     </div>
 
@@ -180,22 +182,22 @@ export default function ServiceRiskMap({ zones }) {
 
         <span className="flex items-center gap-2">
           <span className="w-3 h-3 rounded-full bg-red-600" />
-          Critical
+          {t.critical}
         </span>
 
         <span className="flex items-center gap-2">
           <span className="w-3 h-3 rounded-full bg-orange-500" />
-          High
+          {t.high}
         </span>
 
         <span className="flex items-center gap-2">
           <span className="w-3 h-3 rounded-full bg-yellow-500" />
-          Medium
+          {t.medium}
         </span>
 
         <span className="flex items-center gap-2">
           <span className="w-3 h-3 rounded-full bg-green-500" />
-          Low
+          {t.low}
         </span>
 
       </div>

@@ -45,4 +45,4 @@ export const dummyBlogs = [
       "Weather information can help municipal teams prepare for heavy rainfall, flooding, water contamination and supply stress.",
     author: "JalSahay Analytics Team"
   }
-];npm 
+];

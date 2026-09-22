@@ -2,15 +2,17 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabaseClient';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   const [activeTab, setActiveTab] = useState('complaints');
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fullName = user?.user_metadata?.full_name || 'User';
+  const fullName = user?.user_metadata?.full_name || t.user;
 
   const initials = fullName
     .split(' ')
@@ -63,7 +65,7 @@ export default function Dashboard() {
           <h1 className="text-2xl font-bold">{fullName}</h1>
 
           <p className="text-xs text-slate-500">
-            Citizen ID: {citizenId}
+            {t.citizenIdLabel}: {citizenId}
           </p>
 
           <p className="text-xs text-slate-500 mt-1">
@@ -76,7 +78,7 @@ export default function Dashboard() {
       {/* TABS */}
       <div className="flex space-x-2 border-b border-slate-200 dark:border-slate-800 pb-2 text-sm">
 
-        {['complaints', 'bookmarks', 'notifications'].map((tab) => (
+        {[[t.complaintsTab, 'complaints'], [t.bookmarksTab, 'bookmarks'], [t.notificationsTab, 'notifications']].map(([label, tab]) => (
 
           <button
             key={tab}
@@ -87,7 +89,7 @@ export default function Dashboard() {
                 : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
-            {tab}
+            {label}
           </button>
 
         ))}
@@ -102,13 +104,13 @@ export default function Dashboard() {
           {loading ? (
 
             <div className="text-center py-8 text-slate-400">
-              Loading your complaints...
+              {t.loadingYourComplaints}
             </div>
 
           ) : complaints.length === 0 ? (
 
             <div className="text-center py-12 text-slate-400">
-              You haven't submitted any complaints yet.
+              {t.noComplaintsSubmitted}
             </div>
 
           ) : (
@@ -135,7 +137,7 @@ export default function Dashboard() {
                   </p>
 
                   <p className="text-xs text-slate-400 mt-1">
-                    Priority: {c.priority}
+                    {t.priorityLabel}: {c.priority}
                   </p>
 
                 </div>
@@ -158,7 +160,7 @@ export default function Dashboard() {
       {activeTab === 'bookmarks' && (
 
         <div className="text-center py-8 text-slate-400 text-sm">
-          No bookmarked complaints or municipal notices yet.
+          {t.noBookmarkedNotices}
         </div>
 
       )}
@@ -167,7 +169,7 @@ export default function Dashboard() {
       {activeTab === 'notifications' && (
 
         <div className="text-center py-8 text-slate-400 text-sm">
-          No notifications yet.
+          {t.noNotificationsYet}
         </div>
 
       )}

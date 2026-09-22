@@ -33,8 +33,12 @@ export const supabaseConfigError = (() => {
   return '';
 })();
 
-if (supabaseConfigError && import.meta.env.DEV) {
-  console.error(supabaseConfigError);
+if (
+  supabaseConfigError &&
+  import.meta.env.DEV &&
+  (supabaseUrl || supabaseKey)
+) {
+  console.warn(supabaseConfigError);
 }
 
 export const supabase = createClient(

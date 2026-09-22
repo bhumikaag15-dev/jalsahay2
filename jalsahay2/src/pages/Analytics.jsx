@@ -24,6 +24,7 @@ import {
 
 import ComplaintMap from '../components/ComplaintMap';
 import ServiceRiskMap from '../components/ServiceRiskMap';
+import { useLanguage } from '../context/LanguageContext';
 
 import {
   getComplaintAnalytics,
@@ -37,6 +38,7 @@ export default function Analytics() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const { t } = useLanguage();
 
   async function loadAnalytics() {
 
@@ -100,7 +102,7 @@ export default function Analytics() {
         />
 
         <p className="text-slate-500">
-          Loading live municipal analytics...
+          {t.loadingLiveAnalytics}
         </p>
 
       </div>
@@ -115,7 +117,7 @@ export default function Analytics() {
         <div className="p-6 rounded-2xl bg-red-50 text-red-700">
 
           <h2 className="font-bold text-lg mb-2">
-            Analytics failed to load
+            {t.analyticsFailedToLoad}
           </h2>
 
           <p>
@@ -126,7 +128,7 @@ export default function Analytics() {
             onClick={loadAnalytics}
             className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg"
           >
-            Try Again
+            {t.tryAgain}
           </button>
 
         </div>
@@ -145,6 +147,11 @@ export default function Analytics() {
       zone => zone.riskLevel === 'High'
     ).length;
 
+  const mostAttentionZone =
+    riskZones.length > 0
+      ? [...riskZones].sort((a, b) => b.score - a.score)[0]
+      : null;
+
   return (
 
     <div className="max-w-7xl mx-auto py-8 space-y-8">
@@ -160,17 +167,17 @@ export default function Analytics() {
             <MapPin className="text-blue-600" />
 
             <span className="text-sm font-semibold text-blue-600">
-              LIVE MUNICIPAL OPERATIONS
+              {t.liveMunicipalOperations}
             </span>
 
           </div>
 
           <h1 className="text-3xl font-bold mt-1">
-            Water Intelligence Dashboard
+            {t.waterIntelligenceDashboard}
           </h1>
 
           <p className="text-sm text-slate-500 mt-1">
-            Real complaint data + live weather intelligence
+            {t.realComplaintWeather}
           </p>
 
         </div>
@@ -181,11 +188,36 @@ export default function Analytics() {
         >
           <RefreshCw className="w-4 h-4" />
 
-          Refresh Data
+          {t.refreshData}
         </button>
 
       </div>
 
+
+      {/* AREA REQUIRING MOST ATTENTION */}
+
+      {mostAttentionZone && (
+        <div className="p-6 rounded-3xl border border-red-200 bg-red-50 dark:border-red-900/50 dark:bg-red-950/30">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-red-600">
+                {t.highestAttentionRequired}
+              </p>
+              <h2 className="text-2xl font-bold mt-2">
+                {mostAttentionZone.name}
+              </h2>
+              <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">
+                {mostAttentionZone.riskLevel} {t.risk} · {mostAttentionZone.openComplaints} {t.open.toLowerCase()} {t.complaints.toLowerCase()} · {t.score.toLowerCase()} {mostAttentionZone.score}/100
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-white dark:bg-slate-900 px-4 py-3 text-center shadow-sm">
+              <p className="text-xs uppercase text-slate-500">{t.priorityScore}</p>
+              <p className="text-3xl font-bold text-red-600">{mostAttentionZone.score}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* KPI CARDS */}
 
@@ -193,31 +225,31 @@ export default function Analytics() {
 
         <StatCard
           icon={<Droplets />}
-          title="Total Complaints"
+          title={t.totalComplaints}
           value={analytics.total}
         />
 
         <StatCard
           icon={<Clock />}
-          title="Open"
+          title={t.open}
           value={analytics.open}
         />
 
         <StatCard
           icon={<CheckCircle />}
-          title="Resolved"
+          title={t.resolved}
           value={analytics.resolved}
         />
 
         <StatCard
           icon={<AlertTriangle />}
-          title="Emergency"
+          title={t.emergencyLabel}
           value={analytics.emergency}
         />
 
         <StatCard
           icon={<TrendingUp />}
-          title="High Priority"
+          title={t.highPriority}
           value={analytics.highPriority}
         />
 
@@ -229,22 +261,22 @@ export default function Analytics() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
         <RiskSummary
-          title="Critical Zones"
+          title={t.criticalZones}
           value={criticalZones}
-          description="Immediate monitoring recommended"
+          description={t.immediateMonitoring}
           danger
         />
 
         <RiskSummary
-          title="High Risk Zones"
+          title={t.highRiskZones}
           value={highRiskZones}
-          description="Increased service attention required"
+          description={t.increasedAttention}
         />
 
         <RiskSummary
-          title="Monitored Zones"
+          title={t.monitoredZones}
           value={riskZones.length}
-          description="Weather + complaint monitoring areas"
+          description={t.weatherComplaintAreas}
         />
 
       </div>
@@ -279,7 +311,7 @@ export default function Analytics() {
         <div className="glass-card p-6 rounded-3xl border border-slate-100 dark:border-slate-800">
 
           <h2 className="text-lg font-bold mb-5">
-            Complaints by Category
+            {t.complaintsByCategory}
           </h2>
 
           <div className="h-80">
@@ -337,7 +369,7 @@ export default function Analytics() {
         <div className="glass-card p-6 rounded-3xl border border-slate-100 dark:border-slate-800">
 
           <h2 className="text-lg font-bold mb-5">
-            Complaints by Ward
+            {t.complaintsByWard}
           </h2>
 
           <div className="h-80">
@@ -382,7 +414,7 @@ export default function Analytics() {
       <div className="glass-card p-6 rounded-3xl border border-slate-100 dark:border-slate-800">
 
         <h2 className="text-lg font-bold mb-5">
-          Complaint Status
+          {t.complaintStatus}
         </h2>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -416,7 +448,7 @@ export default function Analytics() {
       <div className="glass-card p-6 rounded-3xl border border-slate-100 dark:border-slate-800">
 
         <h2 className="text-lg font-bold mb-5">
-          Service Risk Analysis
+          {t.serviceRiskAnalysis}
         </h2>
 
         <div className="overflow-x-auto">
@@ -428,31 +460,31 @@ export default function Analytics() {
               <tr className="border-b border-slate-200 dark:border-slate-700">
 
                 <th className="text-left py-3">
-                  Zone
+                  {t.zone}
                 </th>
 
                 <th className="text-left py-3">
-                  Risk
+                  {t.risk}
                 </th>
 
                 <th className="text-left py-3">
-                  Score
+                  {t.score}
                 </th>
 
                 <th className="text-left py-3">
-                  Complaints
+                  {t.complaints}
                 </th>
 
                 <th className="text-left py-3">
-                  Rain
+                  {t.rain}
                 </th>
 
                 <th className="text-left py-3">
-                  Rain Probability
+                  {t.rainProbability}
                 </th>
 
                 <th className="text-left py-3">
-                  Action
+                  {t.action}
                 </th>
 
               </tr>
@@ -501,12 +533,12 @@ export default function Analytics() {
                     <td className="py-3">
 
                       {zone.score >= 70
-                        ? 'Immediate inspection'
+                        ? t.immediateInspection
                         : zone.score >= 50
-                        ? 'Increase monitoring'
+                        ? t.increaseMonitoring
                         : zone.score >= 30
-                        ? 'Monitor'
-                        : 'Normal operations'}
+                        ? t.monitor
+                        : t.normalOperations}
 
                     </td>
 
@@ -523,9 +555,7 @@ export default function Analytics() {
       </div>
 
       <p className="text-xs text-slate-400 text-center">
-        Risk scores are decision-support indicators calculated
-        from live weather forecasts and complaint activity.
-        They are not guaranteed predictions of incidents.
+        {t.riskScoreNote}
       </p>
 
     </div>
